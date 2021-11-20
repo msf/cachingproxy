@@ -5,7 +5,6 @@ linters:
     - depguard
     - dogsled
     - dupl
-    - errcheck
     - exhaustive
     - funlen
     - goconst
@@ -38,6 +37,7 @@ linters:
   disable:
     # Those below have a high rate of false positives
     - scopelint
+    - errcheck
     # - whitespace
     # - deadcode
     # - unused
@@ -83,7 +83,7 @@ linters-settings:
   govet:
     check-shadowing: false
   lll:
-    line-length: 150
+    line-length: 120
   maligned:
     suggest-new: true
   misspell:

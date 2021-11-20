@@ -56,14 +56,9 @@ mod-check:
 
 setup: mod-check 
 	@echo "# Workspace $(WORKSPACE)"
-ifneq (,$(wildcard ../../tools.go))
-	@echo "# Installing tools from global tools.go..."
-	@cat ../../tools.go | grep _ | awk -F'"' '{print "go install -v -mod=$(GOMOD) -v "$$2}'|sh -v
-endif
-
 ifneq (,$(wildcard ./tools.go))
 	@echo "# Installing tools from local tools.go..."
-	@cat tools.go | grep _ | awk -F'"' '{print "go install -v -mod=$(GOMOD) -v "$$2}'|sh -v
+	@cat tools.go | grep "^._" | awk -F'"' '{print "go install -v -mod=$(GOMOD) -v "$$2}'|sh -v
 endif
 
 build: mod-check test-unit

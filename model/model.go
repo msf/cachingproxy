@@ -3,8 +3,8 @@ package model
 
 // Message represents a message for the application
 type Message struct {
-	ID      string
-	Content string
+	ID      string `json:"id,omitempty"`
+	Content string `json:"content,omitempty"`
 }
 
 // Valid checks and returns if the message is valid
