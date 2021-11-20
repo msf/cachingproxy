@@ -1,0 +1,217 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "application/api/v1/api.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "EchoService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/example/echo/stream/{id}": {
+      "post": {
+        "summary": "EchoList continues",
+        "operationId": "EchoService_EchoStream",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/v1EchoStreamResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of v1EchoStreamResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id of request",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1EchoStreamRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/example/echo/{id}": {
+      "post": {
+        "summary": "Echo echoes",
+        "operationId": "EchoService_Echo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1EchoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id of request",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1EchoRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1EchoRequest": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "title": "content to be echoed"
+        },
+        "id": {
+          "type": "string",
+          "title": "id of request"
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time",
+          "title": "time of request"
+        }
+      },
+      "title": "EchoRequest request for echo"
+    },
+    "v1EchoResponse": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "title": "content to be echoed"
+        },
+        "id": {
+          "type": "string",
+          "title": "id of response"
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time",
+          "title": "time of response"
+        }
+      },
+      "title": "EchoResponse for EchoRequest"
+    },
+    "v1EchoStreamRequest": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "title": "content to be echoed"
+        },
+        "id": {
+          "type": "string",
+          "title": "id of request"
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time",
+          "title": "time of request"
+        }
+      },
+      "title": "EchoStreamRequest request for echo"
+    },
+    "v1EchoStreamResponse": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "title": "content to be echoed"
+        },
+        "id": {
+          "type": "string",
+          "title": "id of response"
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time",
+          "title": "time of response"
+        }
+      },
+      "title": "EchoStreamResponse for EchoRequest"
+    }
+  }
+}

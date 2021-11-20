@@ -1,0 +1,16 @@
+# https://docs.buf.build/configuration/
+version: v1beta1
+build:
+  roots:
+    - proto
+  # excludes:
+    # - proto/google
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+  ignore:
+    # per the lint configuration docs, the paths for lint ignores have the root
+    # directory stripped so that this configuration works for both sources and images
+    # google/api and google/rpc are the directories within googleapis/ that we want to ignore
+    - google

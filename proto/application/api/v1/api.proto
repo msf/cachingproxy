@@ -1,0 +1,74 @@
+ syntax = "proto3";
+ package application.api.v1;
+ option go_package = "application/api/v1;api";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+
+// EchoRequest request for echo
+message EchoRequest {
+  // content to be echoed
+   string content = 1;
+   // id of request
+   string id = 2;
+
+   // time of request
+   google.protobuf.Timestamp time = 3;
+}
+
+// EchoResponse for EchoRequest
+message EchoResponse {
+  // content to be echoed
+   string content = 1;
+
+   // id of response
+   string id = 2;
+
+   // time of response
+   google.protobuf.Timestamp time = 3;
+ }
+
+// EchoStreamRequest request for echo
+message EchoStreamRequest {
+  // content to be echoed
+   string content = 1;
+
+   // id of request
+   string id = 2;
+
+   // time of request
+   google.protobuf.Timestamp time = 3;
+}
+
+// EchoStreamResponse for EchoRequest
+message EchoStreamResponse {
+  // content to be echoed
+   string content = 1;
+
+   // id of response
+   string id = 2;
+
+   // time of response
+   google.protobuf.Timestamp time = 3;
+ }
+
+
+
+// EchoService echoes
+service EchoService {
+  // Echo echoes
+  rpc Echo(EchoRequest) returns (EchoResponse) {
+    option (google.api.http) = {
+      post: "/v1/example/echo/{id}"
+      body: "*"
+    };
+  }
+  // EchoList continues
+  rpc EchoStream(EchoStreamRequest) returns (stream EchoStreamResponse) {
+    option (google.api.http) = {
+      post: "/v1/example/echo/stream/{id}"
+      body: "*"
+    };
+  };
+ }
