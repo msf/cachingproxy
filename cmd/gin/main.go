@@ -2,9 +2,14 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/msf/cachingproxy/server"
-	log "github.com/sirupsen/logrus"
+	ginlogrus "github.com/rocksolidlabs/gin-logrus"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -16,22 +21,39 @@ var (
 
 	// BuildTime injected at build time
 	BuildTime string
+
+	// ListenPort
+	ListenPort string
+
+	// Logger
+	log *logrus.Logger
 )
 
 func ServeHTTP() error {
+	// TODO: adopt cobra
 	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
+	r := gin.New()
+	r.Use(
+		ginlogrus.Logger(log, "", true, true, os.Stdout, logrus.DebugLevel),
+		gin.Recovery(),
+	)
+	r.Use(gzip.Gzip(gzip.BestSpeed, gzip.WithExcludedPaths([]string{"/metrics"})))
+
 	r.GET("/ping", server.GinPing)
 	r.GET("/echo/:id/:cnt", server.GinMessage)
-	return r.Run(":4321")
+	return r.Run(fmt.Sprintf(":%s", ListenPort))
 }
 
 // init is only used for keeping the command setup within the same file
 func main() {
-	log.WithFields(log.Fields{
-		"Name":      Name,
-		"Version":   Version,
-		"BuildTime": BuildTime,
+	ListenPort = "4321"
+	log = logrus.New()
+
+	log.WithFields(logrus.Fields{
+		"Name":       Name,
+		"Version":    Version,
+		"BuildTime":  BuildTime,
+		"ListenPort": ListenPort,
 	}).Print("Starting now")
 
 	if err := ServeHTTP(); err != nil {

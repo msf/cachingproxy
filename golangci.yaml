@@ -12,7 +12,6 @@ linters:
     - gocyclo
     - gofmt
     - goimports
-    - gomnd
     - goprintffuncname
     - gosec
     - gosimple
@@ -35,8 +34,9 @@ linters:
     - varcheck
   disable:
     # Those below have a high rate of false positives
-    - scopelint
     - errcheck
+    - gomnd
+    - scopelint
     # - whitespace
     # - deadcode
     # - unused
@@ -70,6 +70,7 @@ linters-settings:
       - wrapperFunc
       - sloppyReassign
       - unslice
+      - commentedOutCode   # FIXME, temporary for prototyping
   gocyclo:
     min-complexity: 15
   golint:
