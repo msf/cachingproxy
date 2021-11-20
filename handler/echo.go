@@ -17,7 +17,8 @@ func EchoMessage(m model.Message) (e model.Message, err error) {
 	e.Content = m.Content
 
 	log.WithFields(log.Fields{
+		"id":      m.ID,
 		"content": m.Content,
-	}).Info("Echo done")
+	}).Info("Echo")
 	return e, nil
 }

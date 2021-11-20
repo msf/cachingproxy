@@ -8,23 +8,21 @@ import (
 	"github.com/msf/cachingproxy/model"
 )
 
-func Ping(c *gin.Context) {
+func GinPing(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pong",
 	})
 }
 
-func Echo(c *gin.Context) {
-	// TODO: pass data from gin.Context
+func GinMessage(c *gin.Context) {
 	m := model.Message{
-		ID:      "id",
-		Content: "content",
+		ID:      c.Param("id"),
+		Content: c.Param("cnt"),
 	}
 	r, err := handler.EchoMessage(m)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	// TODO: convert reply to Gin response
 	c.JSON(http.StatusOK, r)
 }

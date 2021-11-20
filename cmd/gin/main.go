@@ -2,7 +2,8 @@
 package main
 
 import (
-	"github.com/msf/cachingproxy/cmd"
+	"github.com/gin-gonic/gin"
+	"github.com/msf/cachingproxy/server"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,6 +18,14 @@ var (
 	BuildTime string
 )
 
+func ServeHTTP() error {
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
+	r.GET("/ping", server.GinPing)
+	r.GET("/echo/:id/:cnt", server.GinMessage)
+	return r.Run(":4321")
+}
+
 // init is only used for keeping the command setup within the same file
 func main() {
 	log.WithFields(log.Fields{
@@ -25,7 +34,7 @@ func main() {
 		"BuildTime": BuildTime,
 	}).Print("Starting now")
 
-	if err := cmd.ServeHTTP(); err != nil {
+	if err := ServeHTTP(); err != nil {
 		log.Error("ServeHTTP error", err)
 	}
 }
