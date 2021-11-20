@@ -6,6 +6,10 @@ type MachineTranslationRequest struct {
 	Metadata MTRequestMetadata `json:"metadata,omitempty"`
 }
 
+func (m MachineTranslationRequest) HasError() error {
+	return nil
+}
+
 type MTRequestMetadata struct {
 	SourceLang string            `json:"source_lang,omitempty"`
 	TargetLang string            `json:"target_lang,omitempty"`

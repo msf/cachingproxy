@@ -26,3 +26,18 @@ func GinMessage(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, r)
 }
+
+func GinMTRoute(c *gin.Context) {
+	var req model.MachineTranslationRequest
+	if err := c.BindJSON(&req); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	r, err := handler.MachineTranslate(req)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, r)
+}
