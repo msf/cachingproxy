@@ -8,13 +8,23 @@ import (
 	"github.com/msf/cachingproxy/model"
 )
 
-func GinPing(c *gin.Context) {
+type GinServer struct {
+	mtHandler handler.MachineTranslationHandler
+}
+
+func NewGinServer() *GinServer {
+	return &GinServer{
+		mtHandler: handler.NewCachingMTHandler(),
+	}
+}
+
+func (s *GinServer) Ping(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pong",
 	})
 }
 
-func GinMessage(c *gin.Context) {
+func (s *GinServer) Message(c *gin.Context) {
 	m := model.Message{
 		ID:      c.Param("id"),
 		Content: c.Param("cnt"),
@@ -27,14 +37,14 @@ func GinMessage(c *gin.Context) {
 	c.JSON(http.StatusOK, r)
 }
 
-func GinMTRoute(c *gin.Context) {
+func (s *GinServer) MachineTranslate(c *gin.Context) {
 	var req model.MachineTranslationRequest
 	if err := c.BindJSON(&req); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	r, err := handler.MachineTranslate(req)
+	r, err := s.mtHandler.Handle(&req)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

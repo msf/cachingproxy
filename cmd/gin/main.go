@@ -39,8 +39,12 @@ func ServeHTTP() error {
 	)
 	r.Use(gzip.Gzip(gzip.BestSpeed, gzip.WithExcludedPaths([]string{"/metrics"})))
 
-	r.GET("/ping", server.GinPing)
-	r.GET("/echo/:id/:cnt", server.GinMessage)
+	srv := server.NewGinServer()
+
+	r.GET("/ping", srv.Ping)
+	r.GET("/echo/:id/:cnt", srv.Message)
+	r.POST("/v1/machine_translate", srv.MachineTranslate)
+
 	return r.Run(fmt.Sprintf(":%s", ListenPort))
 }
 

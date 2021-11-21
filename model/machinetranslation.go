@@ -6,7 +6,7 @@ type MachineTranslationRequest struct {
 	Metadata MTRequestMetadata `json:"metadata,omitempty"`
 }
 
-func (m MachineTranslationRequest) HasError() error {
+func (m *MachineTranslationRequest) HasError() error {
 	return nil
 }
 
@@ -18,6 +18,8 @@ type MTRequestMetadata struct {
 
 type MachineTranslationResponse struct {
 	RequestID       string            `json:"request_id,omitempty"`
-	TargetSegments  []string          `json:"target_segments,omitempty"`
+	TargetSegments  []TargetSegment   `json:"target_segments,omitempty"`
 	RequestMetadata MTRequestMetadata `json:"request_metadata,omitempty"`
 }
+
+type TargetSegment string
