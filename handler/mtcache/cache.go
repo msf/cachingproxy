@@ -1,4 +1,4 @@
-package cache
+package mtcache
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/dgraph-io/ristretto"
+	"github.com/msf/cachingproxy/handler"
 	"github.com/msf/cachingproxy/model"
 )
 
@@ -14,16 +15,22 @@ type Config struct {
 	MaxTTL    time.Duration
 }
 
-type CachingSegmentTranslator struct {
+type MachineTranslationCache interface {
+	handler.MachineTranslationHandler
+	Save(model.MTRequestMetadata, []string, []model.TargetSegment) error
+	Metrics() string
+}
+
+type machineTranslationCache struct {
 	cache  *ristretto.Cache
 	config Config
 }
 
-func NewCachingSegmentTranslator(config Config) (*CachingSegmentTranslator, error) {
+func NewCachingSegmentTranslator(config Config) (MachineTranslationCache, error) {
 	// docs of ristretto just say use 64  :-|
 	const BufferItemCount = 64
 	cache, err := ristretto.NewCache(&ristretto.Config{
-		MaxCost:     int64(config.MaxSizeMB << 20),
+		MaxCost:     config.MaxSizeMB << 20, // mb to bytes
 		BufferItems: BufferItemCount,
 		// assuming ~100bytes per entry
 		NumCounters: 10_000 * config.MaxSizeMB,
@@ -32,13 +39,37 @@ func NewCachingSegmentTranslator(config Config) (*CachingSegmentTranslator, erro
 	if err != nil {
 		return nil, err
 	}
-	return &CachingSegmentTranslator{
+	return &machineTranslationCache{
 		cache:  cache,
 		config: config,
 	}, nil
 }
 
-func (c *CachingSegmentTranslator) Save(
+func (c *machineTranslationCache) Handle(
+	req *model.MachineTranslationRequest,
+) (*model.MachineTranslationResponse, error) {
+	keys := keysFor(req.Metadata, req.Segments)
+
+	resp := make([]model.TargetSegment, len(keys))
+	for i, k := range keys {
+		var val model.TargetSegment
+		v, found := c.cache.Get(k)
+		if !found {
+			// empty strings to indicate cache miss
+			val = ""
+		} else {
+			val = v.(model.TargetSegment)
+		}
+		resp[i] = val
+	}
+	return &model.MachineTranslationResponse{
+		RequestID:       req.ID,
+		TargetSegments:  resp,
+		RequestMetadata: req.Metadata,
+	}, nil
+}
+
+func (c *machineTranslationCache) Save(
 	metadata model.MTRequestMetadata,
 	sourceSegments []string,
 	targetSegments []model.TargetSegment,
@@ -49,39 +80,19 @@ func (c *CachingSegmentTranslator) Save(
 	}
 
 	keys := keysFor(metadata, sourceSegments)
-	for i, tgt_seg := range targetSegments {
+	for i, seg := range targetSegments {
 		c.cache.SetWithTTL(
 			keys[i],
-			tgt_seg,
-			int64(len([]byte(tgt_seg))),
+			seg,
+			int64(len([]byte(seg))),
 			c.config.MaxTTL,
 		)
 	}
 	return nil
 }
 
-func (m *CachingSegmentTranslator) Handle(
-	req *model.MachineTranslationRequest,
-) ([]model.TargetSegment, error) {
-	keys := keysFor(req.Metadata, req.Segments)
-
-	resp := make([]model.TargetSegment, len(keys))
-	for i, k := range keys {
-		var val model.TargetSegment
-		v, found := m.cache.Get(k)
-		if !found {
-			// empty strings indicate cache miss
-			val = ""
-		} else {
-			val = v.(model.TargetSegment)
-		}
-		resp[i] = val
-	}
-	return resp, nil
-}
-
-func (m *CachingSegmentTranslator) Metrics() string {
-	return m.cache.Metrics.String()
+func (c *machineTranslationCache) Metrics() string {
+	return c.cache.Metrics.String()
 }
 
 func keysFor(md model.MTRequestMetadata, segments []string) []string {

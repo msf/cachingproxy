@@ -4,9 +4,12 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"github.com/msf/cachingproxy/handler/mtcache"
+	"github.com/msf/cachingproxy/handler/mtproxy"
 	"github.com/msf/cachingproxy/server"
 	ginlogrus "github.com/rocksolidlabs/gin-logrus"
 	"github.com/sirupsen/logrus"
@@ -39,7 +42,20 @@ func ServeHTTP() error {
 	)
 	r.Use(gzip.Gzip(gzip.BestSpeed, gzip.WithExcludedPaths([]string{"/metrics"})))
 
-	srv := server.NewGinServer()
+	// TODO: cmdline args for this
+	srv, err := server.NewGinServer(
+		mtcache.Config{
+			MaxSizeMB: 20,
+			MaxTTL:    72 * time.Hour,
+		},
+		map[mtproxy.RoutingKey]string{
+			{SourceLang: "en", TargetLang: "pt"}: "bananas.foo",
+			{}:                                   "bar.foo",
+		},
+	)
+	if err != nil {
+		return err
+	}
 
 	r.GET("/ping", srv.Ping)
 	r.GET("/echo/:id/:cnt", srv.Message)

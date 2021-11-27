@@ -5,6 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/msf/cachingproxy/handler"
+	mt "github.com/msf/cachingproxy/handler/mt"
+	"github.com/msf/cachingproxy/handler/mtcache"
+	"github.com/msf/cachingproxy/handler/mtproxy"
 	"github.com/msf/cachingproxy/model"
 )
 
@@ -12,10 +15,16 @@ type GinServer struct {
 	mtHandler handler.MachineTranslationHandler
 }
 
-func NewGinServer() *GinServer {
-	return &GinServer{
-		mtHandler: handler.NewCachingMTHandler(),
+func NewGinServer(cacheConfig mtcache.Config,
+	routingMap map[mtproxy.RoutingKey]string,
+) (*GinServer, error) {
+	mtH, err := mt.NewCachingMTHandler(cacheConfig, routingMap)
+	if err != nil {
+		return nil, err
 	}
+	return &GinServer{
+		mtHandler: mtH,
+	}, nil
 }
 
 func (s *GinServer) Ping(c *gin.Context) {
