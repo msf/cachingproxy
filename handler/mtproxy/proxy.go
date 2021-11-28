@@ -8,15 +8,14 @@ import (
 	"github.com/msf/cachingproxy/model"
 )
 
-type RoutingKey struct {
+type RoutingKey struct { // TODO use more fields
 	SourceLang string
 	TargetLang string
-	// TODO use more fields
 }
 
 // MaestroProxyTranslator translates by calling maestro endpoints
 type MaestroProxyTranslator struct {
-	client http.Client
+	client http.Client // TODO http retry logic
 
 	// used to identify to which hostname/path a request should go
 	routingMap map[RoutingKey]string
@@ -51,7 +50,7 @@ func keyForReq(req *model.MachineTranslationRequest) RoutingKey {
 	}
 }
 
-func (m *MaestroProxyTranslator) doRequest(
+func (m *MaestroProxyTranslator) doRequest( //TODO: invoke maestro
 	hostname string, req *model.MachineTranslationRequest,
 ) (resq *model.MachineTranslationResponse, err error) {
 	err = fmt.Errorf("doRequest not implemented")

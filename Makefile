@@ -63,8 +63,7 @@ endif
 
 build: mod-check test-unit
 	@echo "# Building target to $(WORKSPACE_TMP_BUILD)/$(APPLICATION)..."
-	CGO_ENABLED=0 go build $(GOFLAGS) -o $(WORKSPACE_BIN)/echo ./cmd/echo/main.go
-	CGO_ENABLED=0 go build $(GOFLAGS) -o $(WORKSPACE_BIN)/gin ./cmd/gin/main.go
+	CGO_ENABLED=0 go build $(GOFLAGS) -o $(WORKSPACE_BIN)/mtproxy ./main.go
 
 
 image-build:
