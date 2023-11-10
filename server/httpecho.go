@@ -9,6 +9,7 @@ import (
 )
 
 func EchoPing(c echo.Context) error {
+	c.B
 	type r struct {
 		M string `json:"message"`
 	}
