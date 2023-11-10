@@ -79,19 +79,16 @@ func New(
 }
 
 func (c *maestroClient) MTTask(
-	ctx context.Context, serviceURL string, req *maestro.MTTaskRequest) (*MTResponse, error) {
+	ctx context.Context, serviceURL string, req *maestro.MTTaskRequest) (*maestro.MTResponse, error) {
 
-	startTime := timegenerator.Now()
-	defer func() {
-		metrics.RecordTiming(ctx, metricTimingMT, time.Since(startTime))
-	}()
+	startTime := time.Now()
 
 	respBuffer, err := c.callMachineTranslate(ctx, serviceURL, req, machineTranslatePath)
 	if err != nil {
 		return nil, err
 	}
 
-	var resp MTResponse
+	var resp maestro.MTResponse
 	err = ParseMTResponse(respBuffer, &resp)
 	if err != nil {
 		err = errors.Wrap(err, "maestro response parsing failed")
@@ -104,7 +101,7 @@ func (c *maestroClient) MTTask(
 func (c *maestroClient) callMachineTranslate(
 	ctx context.Context,
 	MTModelURL string,
-	req *MTRequest,
+	req *maestro.MTRequest,
 	path string,
 ) ([]byte, error) {
 

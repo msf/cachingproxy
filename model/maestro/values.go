@@ -192,26 +192,6 @@ func ParseMTResponse(respBuffer []byte, resp *MTResponse) error {
 	return nil
 }
 
-// ParsePivotedMTResponse can decode the complex pivoted mt_response
-// TODO(msf): handle the nested dicts inside Nuggets correctly
-func ParsePivotedMTResponse(respBuffer []byte, resp *PivotedMTResponse) error {
-	err := json.NewDecoder(bytes.NewReader(respBuffer)).Decode(&resp)
-	if err != nil {
-		return errors.Wrapf(err, "json decode error, payload: %v", string(respBuffer))
-	}
-	return nil
-}
-
-// ParseRebuildResponse can decode the complex rebuild response
-// TODO(msf): handle the nested dicts inside Nuggets correctly
-func ParseRebuildResponse(respBuffer []byte, resp *RebuildResponse) error {
-	err := json.NewDecoder(bytes.NewReader(respBuffer)).Decode(&resp)
-	if err != nil {
-		return errors.Wrapf(err, "json decode error, payload: %v", string(respBuffer))
-	}
-	return nil
-}
-
 func (data TranslatedData) QEValue() float64 {
 	// TODO(ak): Use document level QE score from Maestro, do not recompute
 	translatedNuggets := data.Nuggets
@@ -269,11 +249,4 @@ func (data TranslatedData) HasTMs() bool {
 
 func (data TranslatedData) IsMarkupHumanEditable() bool {
 	return data.HTMLFlow == "inline" || data.HTMLFlow == "markup_aligner"
-}
-
-func (data TranslatedData) GetTranslationType() string {
-	if data.HasTMs() {
-		return string(translationtype.TM)
-	}
-	return string(translationtype.MT)
 }

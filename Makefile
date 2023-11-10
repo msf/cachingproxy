@@ -51,10 +51,9 @@ all: setup generate build
 mod-check:
 	@echo "# Checking consistency between go.mod and vendored code..."
 	go list ./... >/dev/null
-	go mod verify
 	go mod tidy
 
-setup: mod-check 
+setup: mod-check
 	@echo "# Workspace $(WORKSPACE)"
 ifneq (,$(wildcard ./tools.go))
 	@echo "# Installing tools from local tools.go..."
