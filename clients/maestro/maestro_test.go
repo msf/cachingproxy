@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-kit/kit/log"
 	"github.com/stretchr/testify/assert"
-	"gitlab.com/Unbabel/architecture-v2/flowrunner/common/go-kit/log"
 )
 
 type roundTripFunc func(req *http.Request) *http.Response
